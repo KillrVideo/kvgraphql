@@ -39,7 +39,7 @@ const userQuery = new GraphQLObjectType({
     name:'userQueryType', //name of the group of queries
     fields:{
         user:{ //name of the specific query
-            type:'usersById', //define the schema element the query is for kinda like table name
+            type:usersById, //define the schema element the query is for kinda like table name
             args:{ //the arguments the query can accept
                 key:{type:UUID}
             },

@@ -11,6 +11,7 @@ app.use('/graphql', graphqlHTTP({
     graphiql: true,
 }));
 
+
 //start server on port 4000 and display start msg in console
 app.listen(4000, () => {
     console.log('Running a GraphQL API server at localhost:4000/graphql')
