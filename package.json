@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "server-start-nodemon": "nodemon src/server.js",
-    "dev-start": "node bin/dev"
+    "dev-start": "node bin/dev",
+    "build":"npm run clean && mkdir prod && babel src -s -d prod",
+    "clean":"rm -rf prod",
+    "production":"npm run build && node bin/production"
   },
   "repository": {
     "type": "git",
@@ -38,7 +40,6 @@
     "grpc": "^1.12.2",
     "lodash": "^4.17.10",
     "node": "^10.4.0",
-    "nodemon": "^1.17.5",
     "simple-get": "^3.0.2",
     "winston": "^2.4.2"
   }
