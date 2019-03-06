@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "node bin/dev",
+    "dev": "node app/dev",
     "build": "npm run clean && mkdir prod && babel src/index.js -s -d prod",
     "clean": "rm -rf prod",
-    "production": "npm run build && node bin/production"
+    "production": "npm run build && node app/production"
   },
   "repository": {
     "type": "git",
@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/mando222/microservice-server#readme",
   "dependencies": {
+    "apollo-datasource-rest": "^0.1.4",
     "apollo-server": "^2.0.0",
     "axios": "^0.18.0",
     "babel": "^6.23.0",
@@ -33,10 +34,12 @@
     "babel-register": "^6.26.0",
     "bluebird": "^3.5.1",
     "config": "^1.30.0",
+    "dotenv": "^6.1.0",
     "env": "0.0.2",
     "express": "^4.16.3",
     "graphql": "^0.13.2",
-    "grpc": "^1.12.2",
+    "grpc": "^1.18.0",
+    "js-yaml": "^3.12.0",
     "lodash": "^4.17.10",
     "node": "^10.4.0",
     "simple-get": "^3.0.2",

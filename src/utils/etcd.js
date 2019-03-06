@@ -2,27 +2,33 @@ import Promise from 'bluebird';
 import { concat as httpGet } from 'simple-get';
 import { logger } from './logging';
 import { ExtendableError } from './extendable-error';
+import config from 'config';
 
-let ETCD_URL = null;
+
 
 /**
  * Get the URL for etcd. Value is computed once then cached and reused.  
  */
 function getEtcdUrl() {
-  if (ETCD_URL !== null) return ETCD_URL;
 
-  // In development environments, use the KILLRVIDEO_DOCKER_IP, otherwise look for KILLRVIDEO_ETCD
-  let etcdHostAndPort = process.env.NODE_ENV === 'development' && !!process.env.KILLRVIDEO_DOCKER_IP
-    ? `${process.env.KILLRVIDEO_DOCKER_IP}:2379`
-    : process.env.KILLRVIDEO_ETCD;
+    let ETCD_URL = null;
 
-  if (!etcdHostAndPort) {
-    throw new Error('Could not find etcd IP and port in KILLRVIDEO_ETCD environment variable');
-  }
+    // let configIPPort = `${config.get('etcdIP')}:2379`;
+    let configIPPort = '127.0.0.1:2379';
 
-  ETCD_URL = `http://${etcdHostAndPort}/v2/keys/killrvideo`;
-  logger.log('verbose', `Using etcd endpoint ${ETCD_URL}`);
-  return ETCD_URL;
+    let etcdHostAndPort = process.env.NODE_ENV === 'development' && !!process.env.KILLRVIDEO_DOCKER_IP
+      ? `${process.env.KILLRVIDEO_DOCKER_IP}:2379`
+        :configIPPort !== null ? configIPPort
+        : process.env.KILLRVIDEO_ETCD;
+
+    if (!etcdHostAndPort) {
+      throw new Error('Could not find etcd IP and port in KILLRVIDEO_ETCD environment variable or the configs in /config');
+    }
+
+    ETCD_URL = `http://${etcdHostAndPort}/v2/keys/killrvideo`;
+    logger.log('verbose', `Using etcd endpoint ${ETCD_URL}`);
+
+    return ETCD_URL;
 }
 
 // HTTP get as Promise returning function

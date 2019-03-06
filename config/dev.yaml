@@ -1,0 +1,3 @@
+##Dev configs
+## static set in the etcd.js file for testing.
+etcdIP: "127.0.0.1"

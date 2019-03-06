@@ -1,5 +1,5 @@
 import { load, credentials, getClientChannel } from 'grpc';
-import grpcExt from 'grpc/src/node/src/grpc_extension.js';
+import grpcExt from 'grpc/src/grpc_extension.js';
 import Promise from 'bluebird';
 import { lookupServiceAsync } from './lookup-service';
 import { logger } from './logging';
@@ -8,7 +8,7 @@ import { logger } from './logging';
  * Reverse lookup (int value => name) of gRPC connectivity states.
  */
 const CONNECTIVITY_STATE_NAMES = Object.keys(grpcExt.connectivityState).reduce((acc, name) => {
-  let val = grpcExt.connectivityState[name];
+    let val = grpcExt.connectivityState[name];
   acc[val] = name;
   return acc;
 }, {});
