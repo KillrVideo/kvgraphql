@@ -13,8 +13,8 @@ function getEtcdUrl() {
 
     let ETCD_URL = null;
 
-    // let configIPPort = `${config.get('etcdIP')}:2379`;
-    let configIPPort = '127.0.0.1:2379';
+    let configIPPort = `${config.get('etcdIP')}:2379`;
+    // let configIPPort = '127.0.0.1:2379';
 
     let etcdHostAndPort = process.env.NODE_ENV === 'development' && !!process.env.KILLRVIDEO_DOCKER_IP
       ? `${process.env.KILLRVIDEO_DOCKER_IP}:2379`

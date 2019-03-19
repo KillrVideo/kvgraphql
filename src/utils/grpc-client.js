@@ -1,5 +1,5 @@
 import { load, credentials, getClientChannel } from 'grpc';
-import grpcExt from 'grpc/src/grpc_extension.js';
+import binding from 'grpc/src/grpc_extension.js';
 import Promise from 'bluebird';
 import { lookupServiceAsync } from './lookup-service';
 import { logger } from './logging';
@@ -7,63 +7,63 @@ import { logger } from './logging';
 /**
  * Reverse lookup (int value => name) of gRPC connectivity states.
  */
-const CONNECTIVITY_STATE_NAMES = Object.keys(grpcExt.connectivityState).reduce((acc, name) => {
-    let val = grpcExt.connectivityState[name];
+const CONNECTIVITY_STATE_NAMES = Object.keys(binding.connectivityState).reduce((acc, name) => {
+    let val = binding.connectivityState[name];
   acc[val] = name;
   return acc;
 }, {});
 
-/**
- * Recursively gets the fully qualified name of a probuf.js reflection value
- */
-function getFullyQualifiedName(value) {
-  if (value === null || value === undefined) {
-    return '';
-  }
-  
-  let name = value.name;
-  const parentName = getFullyQualifiedName(value.parent);
-  if (parentName !== '') {
-    name = parentName + '.' + name;
-  }
-  return name;
-}
+// /**
+//  * Recursively gets the fully qualified name of a probuf.js reflection value
+//  */
+// function getFullyQualifiedName(value) {
+//   if (value === null || value === undefined) {
+//     return '';
+//   }
+//
+//   let name = value.name;
+//   const parentName = getFullyQualifiedName(value.parent);
+//   if (parentName !== '') {
+//     name = parentName + '.' + name;
+//   }
+//   return name;
+// }
 
 // Cache of all service registrations by fully qualified name
 const serviceRegistrations = new Map();
 
-/**
- * Loads a Grpc service proto using the specified root and file paths. Then calls the clientConstructorSelector
- * function with the proto as the single argument which should return the Grpc client constructor of the service
- * being loaded. Returns an object with the proto and the fully qualified name of the service.
- */
-export function loadServiceProto(rootPath, filePath, clientConstructorSelector) {
-  // Load the proto from the file and get the constructor
-  const proto = load({ root: rootPath, file: filePath }, 'proto', { convertFieldsToCamelCase: true });
-  const ClientConstructor = clientConstructorSelector(proto);
-  
-  // Grpc client constructor functions currently have a name property set to 'Client'
-  if (ClientConstructor.name !== 'Client' || !ClientConstructor.service) {
-    throw new Error('ClientConstructor must be a grpc Service constructor');
-  }
-  
-  // Use the reflection value on the constructor to get the service name
-  const fullyQualifiedName = getFullyQualifiedName(ClientConstructor.service);
-  if (serviceRegistrations.has(fullyQualifiedName)) {
-    throw new Error(`There is already a service registered for ${fullyQualifiedName}`);
-  }
-  
-  // Promisify all methods on the prototype (which should have the actual service methods)
-  Promise.promisifyAll(ClientConstructor.prototype);
-  
-  // Save registration
-  serviceRegistrations.set(fullyQualifiedName, ClientConstructor);
-  
-  return {
-    proto,
-    fullyQualifiedName
-  };
-};
+// /**
+//  * Loads a Grpc service proto using the specified root and file paths. Then calls the clientConstructorSelector
+//  * function with the proto as the single argument which should return the Grpc client constructor of the service
+//  * being loaded. Returns an object with the proto and the fully qualified name of the service.
+//  */
+// export function loadServiceProto(rootPath, filePath, clientConstructorSelector) {
+//   // Load the proto from the file and get the constructor
+//   const proto = load({ root: rootPath, file: filePath }, 'proto', { convertFieldsToCamelCase: true });
+//   const ClientConstructor = clientConstructorSelector(proto);
+//
+//   // Grpc client constructor functions currently have a name property set to 'Client'
+//   if (ClientConstructor.name !== 'Client' || !ClientConstructor.service) {
+//     throw new Error('ClientConstructor must be a grpc Service constructor');
+//   }
+//
+//   // Use the reflection value on the constructor to get the service name
+//   const fullyQualifiedName = getFullyQualifiedName(ClientConstructor.service);
+//   if (serviceRegistrations.has(fullyQualifiedName)) {
+//     throw new Error(`There is already a service registered for ${fullyQualifiedName}`);
+//   }
+//
+//   // Promisify all methods on the prototype (which should have the actual service methods)
+//   Promise.promisifyAll(ClientConstructor.prototype);
+//
+//   // Save registration
+//   serviceRegistrations.set(fullyQualifiedName, ClientConstructor);
+//
+//   return {
+//     proto,
+//     fullyQualifiedName
+//   };
+// };
 
 // Cache of service client promsies by fully qualified name
 const serviceClientPromises = new Map();
@@ -97,18 +97,18 @@ function monitorClientChannel(fullyQualifiedName, client) {
 
     let fatal = false;
     switch (newState) {
-      case grpcExt.connectivityState.READY:
+      case binding.connectivityState.READY:
         // Reset failure counter if connected
         failures = 0;
         break;
 
-      case grpcExt.connectivityState.TRANSIENT_FAILURE:
+      case binding.connectivityState.TRANSIENT_FAILURE:
         // Keep track of transient failures
         failures++;
         fatal = (failures >= MAX_TRANSIENT_FAILURES);
         break;
 
-      case grpcExt.connectivityState.FATAL_FAILURE:
+      case binding.connectivityState.FATAL_FAILURE:
         fatal = true;
         break;
 
