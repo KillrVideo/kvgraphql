@@ -146,7 +146,7 @@ const _getGrpcClientAsync = Promise.method(fullyQualifiedName => {
   // Get just the service name from the fully qualified name
   let nameParts = fullyQualifiedName.split('.');
   let serviceName = nameParts[nameParts.length - 1];
-  
+
   // Lookup the service, create the client and return it
   const promise = lookupServiceAsync(serviceName)
     .then(hosts => new ClientConstructor(hosts[0], credentials.createInsecure()))

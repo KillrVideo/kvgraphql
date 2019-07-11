@@ -1,8 +1,11 @@
 import { ApolloServer } from 'apollo-server'
 import typeDefs from './schema'
 import resolvers from './resolvers'
-import {getGrpcClientAsync} from './utils/grpc-client'
-import {lookupServiceAsync} from './utils/lookup-service'
+import {getServiceClientAsync} from './services/factory'
+import { initCassandraAsync } from './utils/cassandra';
+import { withRetries } from './utils/promises';
+import dse from 'dse-driver';
+
 
 
 // export const cassandraConnection=lookupServiceAsync('studio');
@@ -17,9 +20,13 @@ const server = new ApolloServer({
     typeDefs,
     resolvers,
     dataSources: () => ({
-        grpcAPI: new getGrpcClientAsync(),
+        grpcAPI: new getServiceClientAsync(),
+        cassandra: new withRetries(initCassandraAsync, 20, 10, 'Could not initialize Cassandra keyspace', false)
     })
 });
+
+// client.execute('select * from dse_system.encrypted_keys')
+//     .then(result => console.log('success %s', result.rows[0].email));
 
 // This `listen` method launches a web-server.  Existing apps
 // can utilize middleware options, which we'll discuss later.

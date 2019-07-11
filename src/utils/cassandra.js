@@ -1,8 +1,8 @@
-const Promise = require('bluebird');
-const config = require('config');
-const { Client, auth, types as CassandraTypes }  = require('dse-driver');
-const { lookupServiceAsync }  = require('./lookup-service');
-const { logger }  = require('../utils/logging');
+import Promise from 'bluebird';
+import config from 'config';
+import {Client, auth, types as CassandraTypes} from 'dse-driver';
+import lookupServiceAsync from './lookup-service';
+import logger from '../utils/logging';
 
 // Client promises by keyspace
 const clientPromises = new Map();
@@ -34,10 +34,11 @@ export function getCassandraClientAsync(keyspace, dseUsername, dsePassword) {
        * variables.  If they both exist use the values set within them.  If not,
        * use default values for authentication.
        */
+      logger.info(dseUsername)
+        logger.info(dsePassword)
       if (dseUsername && dsePassword) {
         let passwordLength = dsePassword.length;
         logger.info('Using supplied DSE username: "' + dseUsername + '" and password: "***' + dsePassword.substring(passwordLength - 4, passwordLength) + '" from environment variables')
-
         // Use the values passed in from the config
         clientOpts.authProvider = new auth.DsePlainTextAuthProvider(dseUsername, dsePassword);
 
